@@ -8,23 +8,18 @@ import SwiftUI
 
 struct ContentView: View {
 	
-	// properties to control word usage
+	// MARK: - PROPERTIES
 	@State private var usedWords = [String]()
 	@State private var rootWord = ""
 	@State private var newWord = ""
-	
-	// property to control score count
     @State private var score = 0
-    
-	// properties to control Alerts
     @State private var errorTitle = ""
     @State private var errorMessage = ""
     @State private var showingError = false
 	
+	// MARK: - VIEW BODY
     var body: some View {
-		
         NavigationStack {
-			
             List {
 				
                 Section {
@@ -57,6 +52,7 @@ struct ContentView: View {
 			// toolbar button for new game
             .toolbar {
                 Button("New Game", action: startGame)
+					.padding()
             }
 			// modifier for score area
             .safeAreaInset(edge: .bottom) {
@@ -70,28 +66,43 @@ struct ContentView: View {
         }
     }
 	
-	
-	
+	// MARK: - FUNCTIONS
+	/// method to check word entered for accuracy, adds score, continues game
     func addNewWord() {
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         guard answer.count > 3 else {
-            wordError(title: "Word too short", message: "Words must be at least four letters long.")
+			wordError(
+				title: "Word too short",
+				message: "Words must be at least four letters long."
+			)
             return
         }
         guard answer != rootWord else {
-            wordError(title: "Nice try…", message: "You can't use your starting word!")
+			wordError(
+				title: "Nice try…",
+				message: "You can't use your starting word!"
+			)
             return
         }
         guard isOriginal(word: answer) else {
-            wordError(title: "Word used already", message: "Be more original!")
+			wordError(
+				title: "Word used already",
+				message: "Be more original!"
+			)
             return
         }
         guard isPossible(word: answer) else {
-            wordError(title: "Word not possible", message: "You can't spell that word from '\(rootWord)'!")
+			wordError(
+				title: "Word not possible",
+				message: "You can't spell that word from '\(rootWord)'!"
+			)
             return
         }
         guard isReal(word: answer) else {
-            wordError(title: "Word not recognized", message: "You can't just make them up, you know!")
+			wordError(
+				title: "Word not recognized",
+				message: "You can't just make them up, you know!"
+			)
             return
         }
         withAnimation {
@@ -101,14 +112,16 @@ struct ContentView: View {
         score += answer.count
     }
 	
-	
-	
+	/// <#Description#>
     func startGame() {
         newWord = ""
         usedWords.removeAll()
         score = 0
 		// find the URL for start.txt in the app bundle
-        if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
+		if let startWordsURL = Bundle.main.url(
+			forResource: "start",
+			withExtension: "txt"
+		) {
 			// if we've found the file, we can now load
             if let startWords = try? String(contentsOf: startWordsURL) {
 				// if we've loaded the file, what to do next?
@@ -124,16 +137,17 @@ struct ContentView: View {
         fatalError("Could not load start.txt from bundle.")
     }
 	
-	
-	
-	// this method accepts a string as its only parameter, returns true or false
+	/// <#Description#>
+	/// - Parameter word: <#word description#>
+	/// - Returns: <#description#>
     func isOriginal(word: String) -> Bool {
 		// this must return true if word has not been used already
         !usedWords.contains(word)
     }
 	
-	
-	
+	/// <#Description#>
+	/// - Parameter word: <#word description#>
+	/// - Returns: <#description#>
     func isPossible(word: String) -> Bool {
 		// making a variable copy of rootword to loop over
         var tempWord = rootWord
@@ -152,8 +166,9 @@ struct ContentView: View {
         return true
     }
 	
-	
-	
+	/// <#Description#>
+	/// - Parameter word: <#word description#>
+	/// - Returns: <#description#>
     func isReal(word: String) -> Bool {
 		// required to check spelling of words
         let checker = UITextChecker()
@@ -171,8 +186,10 @@ struct ContentView: View {
         return misspelledRange.location == NSNotFound
     }
 	
-	
-	
+	/// <#Description#>
+	/// - Parameters:
+	///   - title: <#title description#>
+	///   - message: <#message description#>
     func wordError(title: String, message: String) {
         errorTitle = title
         errorMessage = message
